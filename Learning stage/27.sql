@@ -1,18 +1,33 @@
-WITH x AS (
-    SELECT p.maker, pc.model, pc.speed, pc.ram
-    FROM product p
-    JOIN pc ON p.model = pc.model
-    WHERE p.maker IN (
-        SELECT maker
-        FROM product
-        WHERE type = 'printer'
-    )
-)
-SELECT DISTINCT maker
-FROM x
-WHERE ram = (SELECT MIN(ram) FROM x)
-  AND speed = (
-      SELECT MAX(speed)
-      FROM x
-      WHERE ram = (SELECT MIN(ram) FROM x)
-  );
+with
+  t as (
+    SELECT DISTINCT
+      maker
+    from
+      product
+    where
+    type = 'Printer'
+  )
+SELECt
+  maker,
+  avg(Pc.hd)
+from
+  product p
+  JOIN Pc ON Pc.model = p.model
+where
+  maker = ANY (
+    SELECT
+      maker
+    from
+      product
+    where
+    type = 'PC'
+    Intersect
+    SELECT DISTINCT
+      maker
+    from
+      product
+    where
+    type = 'Printer'
+  )
+Group by
+  maker
